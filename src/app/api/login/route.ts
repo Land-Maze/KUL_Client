@@ -3,6 +3,7 @@ import axios from "axios";
 import { CookieJar } from "tough-cookie";
 import { wrapper } from "axios-cookiejar-support";
 import { load } from "cheerio";
+import { cookies } from "next/headers";
 
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
@@ -48,9 +49,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       error: "Invalid credentials",
     }, { status: 401 });
-  }  
+  }
+  
+  const cookieStore = await cookies();
+
+  cookieStore.set({
+    name: "s4el",
+    value: (await jar.getCookieString("https://e.kul.pl")).split("=")[1],
+    httpOnly: true,
+    path: '/',
+    sameSite: 'lax',
+    secure: true,
+    maxAge: (formData.get("expiringTillDay") as string) === "true" ? 60 * 60 * 24 : undefined, // 1 day
+  })
   
   return NextResponse.json({
-    session: await jar.getCookieString("https://e.kul.pl")
+    status: "ok",
   });
 }

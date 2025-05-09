@@ -30,13 +30,13 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 
 import { formSchema } from "@/schemas/login.schema";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { Switch } from "@/components/ui/switch";
 
 export default function AuthPage() {
   const { push } = useRouter();
@@ -47,6 +47,7 @@ export default function AuthPage() {
     defaultValues: {
       login: "",
       password: "",
+      expiringTillDay: true,
     },
   });
 
@@ -90,7 +91,7 @@ export default function AuthPage() {
         push("/schedule");
       }, 1000);
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, push]);
 
   return (
     <main className="flex flex-col items-center justify-center p-24 h-full">
@@ -140,6 +141,24 @@ export default function AuthPage() {
                           />
                         </FormControl>
                         <FormDescription>Enter your password</FormDescription>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <FormField
+                    control={form.control}
+                    name="expiringTillDay"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl>
+                          <Switch
+                          className="cursor-pointer"
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel>Session lasts day</FormLabel>
                       </FormItem>
                     )}
                   />

@@ -20,16 +20,10 @@ export default function SideMenubar() {
   const { push } = useRouter();
 
   useEffect(() => {
-    if (isLoggedIn) {
-      push("/auth");
-    }
-  }, []);
-
-  useEffect(() => {
     if (!isLoggedIn) {
       push("/auth");
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, push]);
 
   return (
     <>
