@@ -24,13 +24,9 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  const $ = load(pageFetch.data);
+  const post_kod = load(pageFetch.data)("input[name=post_kod]").val();
 
-  const post_kod = $("input[name=post_kod]").val();
-
-  console.log("post_kod", post_kod);
-
-  const response = await client("https://e.kul.pl/login.html", {
+  const res = await client("https://e.kul.pl/login.html", {
     method: "POST",
     headers: {
       "Referer": "https://e.kul.pl/login.html",
@@ -48,6 +44,12 @@ export async function POST(req: NextRequest) {
     }),
   });
 
+  if(load(res.data)("title").text().toLowerCase().includes("logowanie")) {
+    return NextResponse.json({
+      error: "Invalid credentials",
+    }, { status: 401 });
+  }  
+  
   return NextResponse.json({
     session: await jar.getCookieString("https://e.kul.pl")
   });

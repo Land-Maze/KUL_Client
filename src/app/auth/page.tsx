@@ -1,7 +1,13 @@
 "use client";
 
+// ----- MISC -----
 import * as React from "react";
+import { useRouter } from "next/navigation";
 
+// ----- CONTEXT -----
+import { useShared } from "@/context/SharedContext";
+
+// ----- UI -----
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,9 +17,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+
+// ----- FORM IMPORTS -----
 
 import {
   Form,
@@ -26,13 +34,14 @@ import {
 } from "@/components/ui/form";
 
 import { formSchema } from "@/schemas/login.schema";
-
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { useRouter } from "next/router";
 
 export default function AuthPage() {
+  const { push } = useRouter();
+  const { isLoggedIn, setIsLoggedIn } = useShared();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -51,13 +60,14 @@ export default function AuthPage() {
         body: new URLSearchParams({
           login: values.login,
           password: values.password,
-        })
+        }),
       }),
       {
         loading: "Logging in...",
         success: async (data) => {
           if (data.ok) {
             localStorage.setItem("session", (await data.json()).session);
+            setIsLoggedIn(true);
             return "Logged in successfully";
           } else {
             throw new Error("Invalid credentials");
@@ -72,9 +82,15 @@ export default function AuthPage() {
         },
       }
     );
-
-    useRouter().push("/schedule");
   }
+
+  React.useEffect(() => {
+    if (isLoggedIn) {
+      setTimeout(() => {
+        push("/schedule");
+      }, 1000);
+    }
+  }, [isLoggedIn]);
 
   return (
     <main className="flex flex-col items-center justify-center p-24 h-full">

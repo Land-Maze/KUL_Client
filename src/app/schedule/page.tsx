@@ -1,9 +1,9 @@
-// page.tsx
 "use client";
 
 
-export default function SchedulePage() {
+export default function SchedulePage() {  
   return (
-    <></>
+    <>
+    </>
   );
 }
