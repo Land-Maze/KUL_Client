@@ -5,8 +5,6 @@ import "./globals.css";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 
-import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
-
 import Footer from "@/components/Footer";
 import SideMenubar from "@/components/Sidebar";
 import { SharedProvider } from "@/context/SharedContext";

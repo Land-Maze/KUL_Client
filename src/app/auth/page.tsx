@@ -38,9 +38,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Switch } from "@/components/ui/switch";
 
+import useAPI from "@/hooks/useAPI";
+
 export default function AuthPage() {
   const { push } = useRouter();
   const { isLoggedIn, setIsLoggedIn } = useShared();
+
+  const toastIdRef = React.useRef<string | number>(0);
+  const { data, callAPI } = useAPI(toastIdRef);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,38 +57,73 @@ export default function AuthPage() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    toast.promise(
-      fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
-          login: values.login,
-          password: values.password,
-        }),
+    // toast.promise(
+    //   fetch("/api/login", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/x-www-form-urlencoded",
+    //     },
+    //     body: new URLSearchParams({
+    //       login: values.login,
+    //       password: values.password,
+    //     }),
+    //   }),
+    //   {
+    //     loading: "Logging in...",
+    //     success: async (data) => {
+    //       if (data.ok) {
+    //         localStorage.setItem("session", (await data.json()).session);
+    //         setIsLoggedIn(true);
+    //         return "Logged in successfully";
+    //       } else {
+    //         throw new Error("Invalid credentials");
+    //       }
+    //     },
+    //     error: (err) => {
+    //       if (err instanceof Error) {
+    //         return err.message;
+    //       } else {
+    //         return "An error occurred";
+    //       }
+    //     },
+    //   }
+    // );
+    callAPI("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        login: values.login,
+        password: values.password,
+        expiringTillDay: values.expiringTillDay ? "true" : "false",
       }),
-      {
-        loading: "Logging in...",
-        success: async (data) => {
-          if (data.ok) {
-            localStorage.setItem("session", (await data.json()).session);
-            setIsLoggedIn(true);
-            return "Logged in successfully";
-          } else {
-            throw new Error("Invalid credentials");
-          }
-        },
-        error: (err) => {
-          if (err instanceof Error) {
-            return err.message;
-          } else {
-            return "An error occurred";
-          }
-        },
-      }
-    );
+    });
+
+    toastIdRef.current = toast.loading("Logging in...");
   }
+
+  React.useEffect(() => {
+    if (data) {
+      if (data.error) {
+        toast.error(data.error, { id: toastIdRef.current });
+      } else if (data.status === "ok") {
+        setIsLoggedIn(true);
+        toast.success("Logged in successfully", { id: toastIdRef.current });
+      }
+    }
+  }, [data, setIsLoggedIn]);
+
+  // React.useEffect(() => {
+  //   if (data) {
+  //     if (data.error) {
+  //       toast.error(data.error);
+  //     } else if (data.status === "ok") {
+  //       setIsLoggedIn(true);
+  //       toast.success("Logged in successfully");
+  //     }
+  //   }
+  // }, [data, setIsLoggedIn]);
 
   React.useEffect(() => {
     if (isLoggedIn) {
@@ -153,7 +193,7 @@ export default function AuthPage() {
                       <FormItem className="flex items-center space-x-2">
                         <FormControl>
                           <Switch
-                          className="cursor-pointer"
+                            className="cursor-pointer"
                             checked={field.value}
                             onCheckedChange={field.onChange}
                           />

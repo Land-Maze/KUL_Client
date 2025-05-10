@@ -53,6 +53,9 @@ export async function POST(req: NextRequest) {
   
   const cookieStore = await cookies();
 
+  const nextDay = new Date()
+  nextDay.setHours(23, 59, 59, 999);
+
   cookieStore.set({
     name: "s4el",
     value: (await jar.getCookieString("https://e.kul.pl")).split("=")[1],
@@ -60,7 +63,7 @@ export async function POST(req: NextRequest) {
     path: '/',
     sameSite: 'lax',
     secure: true,
-    maxAge: (formData.get("expiringTillDay") as string) === "true" ? 60 * 60 * 24 : undefined, // 1 day
+    maxAge: (formData.get("expiringTillDay") as string) === "true" ? Math.floor((nextDay.getTime() - new Date().getTime()) / 1000) : undefined, // until tomorrow
   })
   
   return NextResponse.json({
