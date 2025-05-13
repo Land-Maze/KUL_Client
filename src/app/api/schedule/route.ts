@@ -6,6 +6,16 @@ import { wrapper } from "axios-cookiejar-support";
 import { load } from "cheerio";
 import { cookies } from "next/headers";
 
+export type ScheduleEntry = {
+  idx: number;
+  Day: string;
+  Room: string;
+  Hours: string;
+  Subject: string;
+  Teacher: string;
+  Cycle: string;
+}
+
 export async function GET(req: NextRequest) {
 
   // https://e.kul.pl/qlsidx.html?op=50&s_qpstud=12
@@ -14,8 +24,6 @@ export async function GET(req: NextRequest) {
 
   const jar = new CookieJar();
   const client = wrapper(axios.create({ jar, withCredentials: true }));
-
-  console.log(cookieStore.get("s4el"));
 
   jar.setCookie(
     "s4el= " + cookieStore.get("s4el")?.value +
@@ -43,15 +51,45 @@ export async function GET(req: NextRequest) {
     }, { status: 500 });
   }
 
+  const payload: ScheduleEntry[] = []
+  let currentDay = ""; // this is for parsing the day header, not the actual day
+  let idx=0;
+
   const $ = load(pageFetch.data);
-  const schedule = $("table#datatab_1").html();
-  const scheduleData = {
-    schedule: schedule,
-  };
+
+  $('#datatab_1 tr').each((i, row) => {
+    const $row = $(row);
+  
+    // Check for day header row
+    if ($row.hasClass('s4row_1')) {
+      currentDay = $row.find('td').text().split('(')[0].trim();
+    }
+  
+    // Skip non-data rows
+    if (!$row.hasClass('s4row_0')) return;
+  
+    const cells = $row.find('td');
+  
+    const room = $(cells[0]).text().trim();
+    const time = $(cells[1]).text().trim().replace(/\s+/g, ' ');
+    const cycle = $(cells[2]).text().trim();
+    const subject = $(cells[3]).text().trim();
+    const teacher = $(cells[4]).text().trim();
+  
+    payload.push({
+      idx: idx++,
+      Day: currentDay,
+      Room: room,
+      Hours: time,
+      Cycle: cycle,
+      Subject: subject,
+      Teacher: teacher,
+    });
+  });
   
 
   return NextResponse.json(
-    scheduleData,
+    payload,
     {
       status: 200,
       headers: {

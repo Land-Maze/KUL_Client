@@ -1,12 +1,24 @@
 "use client";
 
-import useInitialAuthCheck from "@/hooks/useInitialAuthCheck";
-import useApi from "@/hooks/useAPI";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 
+
+import useApi from "@/hooks/useAPI";
+import { ScheduleEntry } from "../api/schedule/route";
 
 export default function SchedulePage() {  
 
   const { data, callAPI } = useApi();
+
+  const entries: ScheduleEntry[] = data || [];
 
   return (
     <> 
@@ -22,10 +34,28 @@ export default function SchedulePage() {
           Fetch Schedule
         </button>
         {data && (
-          <div
-            className="mt-4 p-4 border border-gray-300 rounded"
-            dangerouslySetInnerHTML={{ __html: data.schedule }}
-          />
+          <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Room</TableHead>
+              <TableHead>Hours</TableHead>
+              <TableHead className="text-right">Cycle</TableHead>
+              <TableHead className="text-right">Subject</TableHead>
+              <TableHead className="text-right">Teacher</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {entries.map((entry) => (
+              <TableRow key={entry.idx}>
+                <TableCell>{entry.Room}</TableCell>
+                <TableCell>{entry.Hours}</TableCell>
+                <TableCell className="text-right">{entry.Cycle}</TableCell>
+                <TableCell className="text-right">{entry.Subject}</TableCell>
+                <TableCell className="text-right">{entry.Teacher}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
         )}
       </div>
 
