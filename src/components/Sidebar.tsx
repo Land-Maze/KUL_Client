@@ -35,9 +35,31 @@ export default function SideMenubar() {
         <Sidebar>
           <SidebarContent>
             <SidebarGroup>
-              <SidebarGroupLabel>Application</SidebarGroupLabel>
+              <SidebarGroupLabel>Navigatonal Menu</SidebarGroupLabel>
               <SidebarGroupContent>
-                <SidebarMenu></SidebarMenu>
+                <SidebarMenu>
+                  <SidebarMenuItem
+                    onClick={() => {
+                      push("/schedule");
+                    }}
+                  >
+                    <SidebarMenuButton className="cursor-pointer">Schedule</SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem
+                    onClick={() => {
+                      push("/grades");
+                    }}
+                  >
+                    <SidebarMenuButton className="cursor-pointer">Grades</SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem
+                    onClick={() => {
+                      push("/courses");
+                    }}
+                  >
+                    <SidebarMenuButton className="cursor-pointer">Cources</SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
           </SidebarContent>
