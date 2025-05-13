@@ -5,6 +5,9 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 type SharedContextType = {
   isLoggedIn: boolean;
   setIsLoggedIn: (val: boolean) => void;
+
+  authLoaded: boolean;
+  setAuthLoaded: (val: boolean) => void;
 };
 
 const SharedContext = createContext<SharedContextType | undefined>(undefined);
@@ -15,6 +18,10 @@ export const SharedProvider = ({ children }: { children: ReactNode }) => {
     setIsLoggedIn: (val: boolean) => {
       setValue((prev) => ({ ...prev, isLoggedIn: val }));
     },
+    authLoaded: false,
+    setAuthLoaded: (val: boolean) => {
+      setValue((prev) => ({ ...prev, authLoaded: val }));
+    }
   });
 
   return (

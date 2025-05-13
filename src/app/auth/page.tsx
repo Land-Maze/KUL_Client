@@ -57,37 +57,6 @@ export default function AuthPage() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // toast.promise(
-    //   fetch("/api/login", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/x-www-form-urlencoded",
-    //     },
-    //     body: new URLSearchParams({
-    //       login: values.login,
-    //       password: values.password,
-    //     }),
-    //   }),
-    //   {
-    //     loading: "Logging in...",
-    //     success: async (data) => {
-    //       if (data.ok) {
-    //         localStorage.setItem("session", (await data.json()).session);
-    //         setIsLoggedIn(true);
-    //         return "Logged in successfully";
-    //       } else {
-    //         throw new Error("Invalid credentials");
-    //       }
-    //     },
-    //     error: (err) => {
-    //       if (err instanceof Error) {
-    //         return err.message;
-    //       } else {
-    //         return "An error occurred";
-    //       }
-    //     },
-    //   }
-    // );
     callAPI("/api/login", {
       method: "POST",
       headers: {
@@ -108,30 +77,11 @@ export default function AuthPage() {
       if (data.error) {
         toast.error(data.error, { id: toastIdRef.current });
       } else if (data.status === "ok") {
-        setIsLoggedIn(true);
+        push("/schedule");
         toast.success("Logged in successfully", { id: toastIdRef.current });
       }
     }
   }, [data, setIsLoggedIn]);
-
-  // React.useEffect(() => {
-  //   if (data) {
-  //     if (data.error) {
-  //       toast.error(data.error);
-  //     } else if (data.status === "ok") {
-  //       setIsLoggedIn(true);
-  //       toast.success("Logged in successfully");
-  //     }
-  //   }
-  // }, [data, setIsLoggedIn]);
-
-  React.useEffect(() => {
-    if (isLoggedIn) {
-      setTimeout(() => {
-        push("/schedule");
-      }, 1000);
-    }
-  }, [isLoggedIn, push]);
 
   return (
     <main className="flex flex-col items-center justify-center p-24 h-full">
@@ -143,9 +93,8 @@ export default function AuthPage() {
               <CardDescription>
                 Enter your credentials to access your e.kul.pl account
                 <br />
-                <span className="text-sm text-red-900">
-                  CREDENTIALS WILL NOT BE STORED. THEY WILL BE SENT THROUGH OUR
-                  RELAY TO THE https://e.kul.pl !!!
+                <span className="text-sm text-red-700">
+                By logging in, you authorize this app to use your credentials only to establish a temporary session with e.kul.pl. Your credentials are not stored !!!
                 </span>
               </CardDescription>
             </CardHeader>

@@ -6,15 +6,13 @@ import useAPI from "@/hooks/useAPI";
 import { useRouter } from "next/navigation";
 
 const useInitialAuthCheck = () => {
-  const { setIsLoggedIn } = useShared();
+  const { setIsLoggedIn, setAuthLoaded } = useShared();
   const { data, error, callAPI } = useAPI();
   const router = useRouter();
 
   useEffect(() => {
-    console.log("Checking authentication...");
     const checkAuth = async () => {
       try {
-        console.log("Checking authentication...");
         await callAPI("/api/check-token", {
           method: "GET",
           headers: {
@@ -32,11 +30,13 @@ const useInitialAuthCheck = () => {
   useEffect(() => {
     if (data) {
       if (error) {
+        setAuthLoaded(true);
         setIsLoggedIn(false);
         if (error.error === "Session expired") {
           router.push("/auth");
         }
       } else if (data.status === "ok") {
+        setAuthLoaded(true);
         setIsLoggedIn(true);
       }
     }

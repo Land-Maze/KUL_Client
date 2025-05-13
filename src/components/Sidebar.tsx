@@ -14,13 +14,16 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import useInitialAuthCheck from "@/hooks/useInitialAuthCheck";
 
 export default function SideMenubar() {
-  const { isLoggedIn } = useShared();
+  const { isLoggedIn, authLoaded } = useShared();
   const { push } = useRouter();
+  useInitialAuthCheck();
 
   useEffect(() => {
-    console.log("isLoggedIn", isLoggedIn);
+    if (!authLoaded) return;
+    
     if (!isLoggedIn) {
       push("/auth");
     }
